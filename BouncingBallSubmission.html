@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+    <canvas id="ballCanvas" width="400" height="600" style="border:1px solid" onclick="mousePressed()"
+        onmousemove="mouseOver()">
+
+    </canvas>
+    <script>
+        let canvas, context;
+        const gravity = 1;
+        const friction = 0.08;
+        let ballArray = []
+        let mouseX;
+        let mouseY;
+        let randomColour
+
+        canvas = document.getElementById("ballCanvas");
+        context = canvas.getContext("2d");
+
+        function ball() {
+            this.x = mouseX
+            this.y = mouseY;
+            this.size = 10;
+            this.drag = 0.4;
+            this.velocityY = 0;          
+            this.velocityX = 0;
+            this.colour = randomColour;
+        }
+
+        function mouseOver() {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        }
+
+        function mousePressed() {
+            //Adds a ball object to the array 
+            ballArray.push(new ball());
+
+            //Controls ball speed with a random range from 5 - 15
+            ballArray[ballArray.length - 1].velocityX = ballArray[ballArray.length - 1].velocityX + Math.floor(Math.random() * 11 + 5)
+            ballArray[ballArray.length - 1].velocityY = ballArray[ballArray.length - 1].velocityY + Math.floor(Math.random() * 11 + 5)
+
+            // Random ball X direction at the start
+            if (Math.floor(Math.random() * 2) == 0) {
+                ballArray[ballArray.length - 1].velocityX = -ballArray[ballArray.length - 1].velocityX;
+            }
+            if (Math.floor(Math.random() * 2) == 0) {
+                ballArray[ballArray.length - 1].velocityY = -ballArray[ballArray.length - 1].velocityY;
+            }
+            // Random ball colour chosen
+            ballArray[ballArray.length - 1].colour = Math.floor(Math.random() * 6);
+        }
+
+        //Loops the draw function
+        setInterval(draw, 1000 / 35);
+        function draw() {
+            //Draws the background
+            context.fillStyle = "white";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            //Methods draw each ball and adds movement and friction on X axis of balls.
+            for (let i = 0; i < ballArray.length; i++) {
+                drawBall(ballArray[i])
+                ballMovement(ballArray[i])
+                frictionX(ballArray[i])
+            }
+        }
+
+        //Draws the balls on the canvas
+        function drawBall(ball) {
+            if (ball.colour == 0) {
+                context.fillStyle = "black";
+            } else if (ball.colour == 1) {
+                context.fillStyle = "gold";
+            } else if (ball.colour == 2) {
+                context.fillStyle = "orangeRed";
+            } else if (ball.colour == 3) {
+                context.fillStyle = "forestGreen";
+            } else if (ball.colour == 4){
+                context.fillStyle ="red";
+            }else if (ball.colour == 5){
+                context.fillStyle ="blue";
+            }
+
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.size, 0, 2 * Math.PI);
+            context.fill();
+        }
+
+        //add movement to balls
+        function ballMovement(ball) {
+            ball.velocityY = ball.velocityY + gravity;
+            ball.x = ball.x + ball.velocityX;
+            ball.y = ball.y + ball.velocityY;
+
+            //stops ball going off screen (sides)
+            if (ball.x >= canvas.width - ball.size || ball.x <= ball.size) {
+                ball.velocityX = ball.velocityX * -1;
+            }
+            //stops from falling off screen (bottom) and adds drag to velocity when it hits the floor
+            if (ball.y >= canvas.height - ball.size) {
+                ball.y = canvas.height - ball.size;
+                ball.velocityY = ball.velocityY * -ball.drag;
+            }
+        }
+
+        //Adds friction to the X axis
+        function frictionX(ball) {
+            if (ball.velocityX >= 0) {
+                ball.velocityX -= friction;
+            }
+            if (ball.velocityX < 0) {
+                ball.velocityX += friction;
+            }
+        }
+    </script>
+</body>
+
+</html>
